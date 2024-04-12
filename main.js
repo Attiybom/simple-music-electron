@@ -50,6 +50,12 @@ const createWindow = () => {
     "./renderer/index.html"
   );
 
+  // 获取音乐列表
+  mainWindow.webContents.on("did-finish-load", () => {
+    console.log("did-finish-load")
+    mainWindow.send("getTracks", musicDataStore.getTracks())
+  });
+
   ipcMain.on("add-music-window", (event, arg) => {
     const addMusicWindow = new AppWindow(
       {
@@ -89,6 +95,13 @@ const createWindow = () => {
         event.sender.send("selected-files", result.filePaths);
       });
   });
+
+  ipcMain.on("delete-tracks", (event, id) => {
+
+    const updatedTracks = musicDataStore.deleteTracks(id)?.getTracks()
+    console.log('updatedTracks', updatedTracks)
+    mainWindow.send("getTracks", updatedTracks)
+  } )
 };
 
 app.whenReady().then(() => {
